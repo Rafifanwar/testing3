@@ -1,0 +1,258 @@
+<!DOCTYPE html> 
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: rgb(0, 91, 189);
+            color: white;
+            padding: 20px;
+            position: fixed;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgb(3, 63, 128);
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        .footer {
+            background-color: rgb(203, 204, 204);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+        }
+        .table-responsive {
+            margin-bottom: 80px; /* Memberikan jarak antara tabel dan footer */
+        }
+        thead {
+            background-color: rgb(0, 91, 189) !important;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <h3 class="mb-4">Admin Panel</h3>
+        <a href="{% url 'dashboard_admin' %}" class="{% if request.resolver_match.url_name == 'dashboard_admin' %}active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="{% url 'data_kelas' %}" class="{% if request.resolver_match.url_name == 'data_kelas' %}active{% endif %}"><i class="fas fa-chalkboard"></i> Data Kelas</a>
+        <a href="{% url 'data_user' %}" class="{% if request.resolver_match.url_name == 'data_user' %}active{% endif %}"><i class="fas fa-users"></i> Data Siswa</a>
+        <a href="{% url 'data_kriteria' %}" class="{% if request.resolver_match.url_name == 'data_kriteria' %}active{% endif %}"><i class="fas fa-chart-bar"></i> Data Kriteria</a>
+        <a href="{% url 'data_hasil_cf' %}" class="{% if request.resolver_match.url_name == 'data_hasil_cf' %}active{% endif %}"><i class="fas fa-file-alt"></i> Riwayat Rekomendasi</a>
+        <a href="{% url 'logout_admin' %}" class="{% if request.resolver_match.url_name == 'logout_admin' %}active{% endif %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
+            <div class="container-fluid">
+                <span class="navbar-brand"><h2>Data Kriteria</h2></span>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <!-- Tombol Tambah Kriteria di Kanan Atas -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5>Daftar Kriteria</h5>
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#tambahKriteriaModal">
+                    <i class="bi bi-plus-circle"></i> Tambah Kriteria
+                </button>
+            </div>
+
+            <!-- Tabel Data Kriteria -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-light">
+                        <tr>
+                            <th>NO</th>
+                            <th>Nama Kriteria</th>
+                            <th>Pertanyaan</th>
+                            <th>Kategori</th>
+                            <th>MB</th>
+                            <th>MD</th>
+                            <th>CF Rule</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for kriteria in kriteria %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ kriteria.nama_kriteria }}</td>
+                            <td>{{ kriteria.pertanyaan }}</td>
+                            <td>{{ kriteria.kategori }}</td>
+                            <td>{{ kriteria.mb }}</td>
+                            <td>{{ kriteria.md }}</td>
+                            <td>{{ kriteria.cfrule }}</td>
+                            <td>
+                                <!-- Tombol Ubah -->
+                                <button class="btn btn-primary btn-sm edit-kriteria-btn"
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#editKriteriaModal"
+                                    data-id="{{ kriteria.id }}"
+                                    data-nama="{{ kriteria.nama_kriteria }}"
+                                    data-pertanyaan="{{ kriteria.pertanyaan }}"
+                                    data-kategori="{{ kriteria.kategori }}"
+                                    data-mb="{{ kriteria.mb }}"
+                                    data-md="{{ kriteria.md }}"
+                                    <i class="bi bi-pencil"></i> Ubah
+                                </button>
+
+                                <!-- Tombol Hapus -->
+                                <a href="{% url 'hapus_kriteria' kriteria.id %}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('Apakah Anda yakin ingin menghapus kriteria ini?')">
+                                    <i class="bi bi-trash"></i> Hapus
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center">Tidak ada data kriteria.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Kriteria -->
+  <!-- Modal Tambah Kriteria -->
+<div class="modal fade" id="tambahKriteriaModal" tabindex="-1" aria-labelledby="tambahKriteriaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="tambahKriteriaLabel">Tambah Kriteria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'tambah_kriteria' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Nama Kriteria</label>
+                        <input type="text" name="nama_kriteria" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pertanyaan</label>
+                        <textarea name="pertanyaan" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <select name="kategori" class="form-control" required>
+                            {% for kelas in kelas_list %}
+                                <option value="{{ kelas.nama_kelas }}">{{ kelas.nama_kelas }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Measure of Belief (MB)</label>
+                        <input type="number" step="0.01" name="mb" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Measure of Disbelief (MD)</label>
+                        <input type="number" step="0.01" name="md" class="form-control" required>
+                    </div>
+                   
+                    <button type="submit" class="btn btn-success">Simpan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+ <!-- Modal Edit Kriteria -->
+<div class="modal fade" id="editKriteriaModal" tabindex="-1" aria-labelledby="editKriteriaModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editKriteriaModalLabel">Edit Data Kriteria</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editKriteriaForm" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="kriteria_id" id="edit_kriteria_id">
+                    <div class="mb-3">
+                        <label class="form-label">Nama Kriteria</label>
+                        <input type="text" name="nama_kriteria" id="edit_nama_kriteria" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Pertanyaan</label>
+                        <textarea name="pertanyaan" id="edit_pertanyaan" class="form-control" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kategori</label>
+                        <select name="kategori" id="edit_kategori" class="form-control" required>
+                            <option value="robotik">Robotik</option>
+                            <option value="coding">Coding</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Measure of Belief (MB)</label>
+                        <input type="number" step="0.01" name="mb" id="edit_mb" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Measure of Disbelief (MD)</label>
+                        <input type="number" step="0.01" name="md" id="edit_md" class="form-control" required>
+                    </div>
+                  
+                    <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2025 Admin Dashboard. All Rights Reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".edit-kriteria-btn").forEach(button => {
+                button.addEventListener("click", function() {
+                    document.getElementById("edit_kriteria_id").value = this.dataset.id;
+                    document.getElementById("edit_nama_kriteria").value = this.dataset.nama;
+                    document.getElementById("edit_pertanyaan").value = this.dataset.pertanyaan;
+                    document.getElementById("edit_kategori").value = this.dataset.kategori;
+                    document.getElementById("edit_mb").value = this.dataset.mb;
+                    document.getElementById("edit_md").value = this.dataset.md;
+                   
+    
+                    // Set action URL untuk submit form
+                    document.getElementById("editKriteriaForm").action = "{% url 'ubah_kriteria' 0 %}".replace("0", this.dataset.id);
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

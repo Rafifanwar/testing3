@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: rgb(0, 91, 189);
+            color: white;
+            padding: 20px;
+            position: fixed;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgb(3, 63, 128);
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+        .footer {
+            background-color: rgb(203, 204, 204);
+            color: white;
+            text-align: center;
+            padding: 10px;
+            position: fixed;
+            bottom: 0;
+            width: calc(100% - 250px);
+            margin-left: 250px;
+        }
+        .table-responsive {
+            margin-bottom: 80px; /* Memberikan jarak antara tabel dan footer */
+        }
+        thead {
+            background-color: rgb(0, 91, 189) !important;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar d-flex flex-column">
+        <h3 class="mb-4">Admin Panel</h3>
+        <a href="{% url 'dashboard_admin' %}" class="{% if request.resolver_match.url_name == 'dashboard_admin' %}active{% endif %}">
+            <i class="fas fa-home"></i> Dashboard
+        </a>
+        <a href="{% url 'data_kelas' %}" class="{% if request.resolver_match.url_name == 'data_kelas' %}active{% endif %}">
+            <i class="fas fa-chalkboard"></i> Data Kelas
+        </a>
+        <a href="{% url 'data_user' %}" class="{% if request.resolver_match.url_name == 'data_user' %}active{% endif %}">
+            <i class="fas fa-users"></i> Data Siswa
+        </a>
+        <a href="{% url 'data_kriteria' %}" class="{% if request.resolver_match.url_name == 'data_kriteria' %}active{% endif %}">
+            <i class="fas fa-chart-bar"></i> Data Kriteria
+        </a>
+        <a href="{% url 'data_hasil_cf' %}" class="{% if request.resolver_match.url_name == 'data_hasil_cf' %}active{% endif %}">
+            <i class="fas fa-file-alt"></i> Riwayat Rekomendasi
+        </a>
+        <a href="{% url 'logout_admin' %}" class="{% if request.resolver_match.url_name == 'logout_admin' %}active{% endif %}">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
+            <div class="container-fluid">
+                <span class="navbar-brand"><h2>Data Hasil Perhitungan CF</h2></span>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <!-- Data Hasil CF -->
+            <div class="table-responsive mt-3">
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>NO</th>
+                            <th>Nama Pengguna</th>
+                            <th>Persen Robotik</th>
+                            <th>Persen Coding</th>
+                            <th>Tanggal Trial</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hasil in hasil_cf %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ hasil.user.nama_lengkap }}</td>
+                            <td>{{ hasil.persen_robotik }}%</td>
+                            <td>{{ hasil.persen_coding }}%</td>
+                            <td>{{ hasil.tanggal }}</td>
+                            <td><a href="{% url 'hapus_hasil_cf' hasil.id %}" class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Yakin ingin menghapus kelas ini?')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </a>
+                        </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-center">Tidak ada data hasil CF.</td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        &copy; 2025 Admin Dashboard. All Rights Reserved.
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

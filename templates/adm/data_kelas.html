@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Kelas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color:rgb(0, 91, 189);
+            color: white;
+            padding: 20px;
+            position: fixed;
+        }
+        .sidebar a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 12px;
+            margin: 5px 0;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .sidebar a:hover, .sidebar a.active {
+            background-color: rgb(3, 63, 128);
+        }
+        .content {
+            margin-left: 250px;
+            padding: 20px;
+            width: calc(100% - 250px);
+        }
+    </style>
+</head>
+<body>
+     <div class="sidebar d-flex flex-column">
+        <h3 class="mb-4">Admin Panel</h3>
+        <a href="{% url 'dashboard_admin' %}" class="{% if request.resolver_match.url_name == 'dashboard_admin' %}active{% endif %}"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="{% url 'data_kelas' %}" class="{% if request.resolver_match.url_name == 'data_kelas' %}active{% endif %}"><i class="fas fa-chalkboard"></i> Data Kelas</a>
+        <a href="{% url 'data_user' %}" class="{% if request.resolver_match.url_name == 'data_user' %}active{% endif %}"><i class="fas fa-users"></i> Data Siswa</a>
+        <a href="{% url 'data_kriteria' %}" class="{% if request.resolver_match.url_name == 'data_kriteria' %}active{% endif %}"><i class="fas fa-chart-bar"></i> Data Kriteria</a>
+        <a href="{% url 'data_hasil_cf' %}" class="{% if request.resolver_match.url_name == 'data_hasil_cf' %}active{% endif %}"><i class="fas fa-file-alt"></i> Riwayat Rekomendasi</a>
+        <a href="{% url 'logout_admin' %}" class="{% if request.resolver_match.url_name == 'logout_admin' %}active{% endif %}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </div>
+
+
+    <div class="content">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm p-3">
+            <div class="container-fluid">
+                <h2>Data Kelas</h2>
+            </div>
+        </nav>
+
+        <div class="container mt-4">
+            <!-- Tombol Tambah Kriteria di Kanan Atas -->
+           
+
+        <div class="container mt-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>NO</th>
+                        <th>Nama Kelas</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for kelas in kelas %}
+                    <tr>
+                         <td>{{ forloop.counter }}</td>
+                        <td>{{ kelas.nama_kelas }}</td>
+                        <td>
+                            <button class="btn btn-primary btn-sm edit-kelas-btn" data-bs-toggle="modal" 
+                                    data-bs-target="#editKelasModal" data-id="{{ kelas.id }}" 
+                                    data-nama="{{ kelas.nama_kelas }}">
+                                <i class="fas fa-edit"></i> Ubah
+                            </button>
+                            <a href="{% url 'hapus_kelas' kelas.id %}" class="btn btn-danger btn-sm" 
+                               onclick="return confirm('Yakin ingin menghapus kelas ini?')">
+                                <i class="fas fa-trash"></i> Hapus
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="3" class="text-center">Tidak ada data kelas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal Tambah Kelas -->
+    <div class="modal fade" id="tambahKelasModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Kelas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'tambah_kelas' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label>Nama Kelas</label>
+                            <input type="text" name="nama_kelas" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Simpan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Edit Kelas -->
+    <div class="modal fade" id="editKelasModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Edit Data Kelas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editKelasForm" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="kelas_id" id="kelas_id">
+                        <div class="mb-3">
+                            <label>Nama Kelas</label>
+                            <input type="text" name="nama_kelas" id="nama_kelas" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var editButtons = document.querySelectorAll(".edit-kelas-btn");
+            editButtons.forEach(function(button) {
+                button.addEventListener("click", function() {
+                    document.getElementById("kelas_id").value = this.getAttribute("data-id");
+                    document.getElementById("nama_kelas").value = this.getAttribute("data-nama");
+                    document.getElementById("editKelasForm").action = "{% url 'ubah_kelas' 0 %}".replace("0", this.getAttribute("data-id"));
+                });
+            });
+        });
+    </script>
+</body>
+</html>
