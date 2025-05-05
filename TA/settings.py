@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -80,15 +81,10 @@ WSGI_APPLICATION = 'TA.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER':'postgres',
-        'PASSWORD':'HHQEzLSjTlkjUmZCzGjpWpczYUjzASyI',
-        'HOST':'shuttle.proxy.rlwy.net',
-        'PORT':'34971',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -125,16 +121,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
-
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    os.path.join(BASE_DIR, "assets"),
-    os.path.join(BASE_DIR, "assets2"),
-]
-
-STATIC_ROOT = os.path.join(BASE_DIR,'staticfiles_build','static')
+STATICFILES_DIRS = [BASE_DIR, "static")]
+STATICSTORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -154,4 +142,11 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 # Logout otomatis jika browser ditutup (opsional)
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.railway.app',  # Untuk domain Railway
+    'https://*.up.railway.app',  # Format domain Railway yang umum
+    'http://localhost:8000',  # Untuk development lokal
+    'http://127.0.0.1:8000',  # Untuk development lokal
+    # Tambahkan domain custom Anda jika ada
+]
 
